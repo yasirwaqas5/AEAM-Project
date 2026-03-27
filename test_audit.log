@@ -1,0 +1,4 @@
+{"user_id": "unknown", "action": "GET", "endpoint": "/protected", "status_code": 200, "timestamp": "2026-03-19T13:00:44.093861+00:00", "hash": "dac862353677e435fbae0bddcbdb87ced0d0d424f4fcc264f31296e64eee8618"}
+{"user_id": "anonymous", "action": "GET", "endpoint": "/protected", "status_code": 200, "timestamp": "2026-03-19T13:00:44.109478+00:00", "hash": "f6050197fd5d89a38a123e0a67577e27782ffbd986b0ebb0d1264dfd477f4450"}
+{"user_id": "unknown", "action": "GET", "endpoint": "/protected", "status_code": 200, "timestamp": "2026-03-19T13:00:44.169620+00:00", "hash": "7a05ad535def35e60d219be22e4918d3bdf705b8e497101b98aca7a29f6c72d1"}
+{"user_id": "unknown", "action": "GET", "endpoint": "/protected", "status_code": 200, "timestamp": "2026-03-19T13:00:44.198625+00:00", "hash": "2192e56b5419c79a46673c122ddda0ece1779261a45e80f9177d391fc0a38860"}
