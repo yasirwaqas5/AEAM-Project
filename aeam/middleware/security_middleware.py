@@ -295,7 +295,11 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         Returns:
             ``True`` if security checks should be skipped.
         """
-        return path.startswith(_INTERNAL_PREFIX) or path in _PUBLIC_PATHS
+        normalized_path = path.rstrip("/")
+        return (
+            normalized_path.startswith(_INTERNAL_PREFIX)
+            or normalized_path in _PUBLIC_PATHS
+        )
 
     @staticmethod
     def _extract_bearer_token(request: Request) -> str | None:

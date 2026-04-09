@@ -10,6 +10,7 @@ No secrets are hardcoded. Required fields will raise a ValidationError at startu
 if not provided via the environment.
 """
 
+from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, field_validator
 
@@ -20,11 +21,11 @@ class Settings(BaseSettings):
 
     Required environment variables:
         - DATABASE_URL
-        - REDIS_URL
-        - VECTOR_DB_URL
-        - ENVIRONMENT
 
     Optional environment variables (with defaults):
+        - REDIS_URL (default: None)
+        - VECTOR_DB_URL (default: None)
+        - ENVIRONMENT (default: "development")
         - MONITOR_INTERVAL_SECONDS (default: 300)
         - MAX_INVESTIGATION_DEPTH (default: 5)
         - LLM_ENABLED (default: False)
@@ -51,22 +52,24 @@ class Settings(BaseSettings):
         description="Connection string for relational database (e.g. PostgreSQL or SQLite).",
     )
 
-    REDIS_URL: str = Field(
-        ...,
-        description="Connection string for Redis instance.",
+    # --- Optional settings (can be None to disable) ---
+
+    REDIS_URL: Optional[str] = Field(
+        default=None,
+        description="Connection string for Redis instance. If not set, Redis features (deduplication, rate limiting) are disabled.",
     )
 
-    VECTOR_DB_URL: str = Field(
-        ...,
-        description="Connection string or endpoint for vector database.",
+    VECTOR_DB_URL: Optional[str] = Field(
+        default=None,
+        description="Connection string or endpoint for vector database. If not set, vector memory features are disabled.",
     )
 
     ENVIRONMENT: str = Field(
-        ...,
+        default="development",
         description="Deployment environment: development, staging, or production.",
     )
 
-    # --- Optional settings with defaults ---
+    # --- Other optional settings with defaults ---
 
     MONITOR_INTERVAL_SECONDS: int = Field(
         default=300,

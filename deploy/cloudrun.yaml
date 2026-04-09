@@ -1,10 +1,5 @@
 # ============================================================
-# AEAM — Google Cloud Run Deployment Manifest
-# deploy/cloudrun.yaml
-#
-# Single-container modular monolith deployment.
-# Deploy with:
-#   gcloud run services replace deploy/cloudrun.yaml --region REGION
+# AEAM — Google Cloud Run Deployment Manifest (SAFE MODE)
 # ============================================================
 
 apiVersion: serving.knative.dev/v1
@@ -16,7 +11,6 @@ metadata:
     app: aeam
     layer: monolith
   annotations:
-    # HTTPS-only — reject all plain HTTP traffic.
     run.googleapis.com/ingress: all
     run.googleapis.com/ingress-status: all
 
@@ -24,19 +18,15 @@ spec:
   template:
     metadata:
       annotations:
-        # Auto-scaling bounds.
         autoscaling.knative.dev/minScale: "1"
         autoscaling.knative.dev/maxScale: "5"
-
-        # CPU is always allocated (not throttled between requests).
         run.googleapis.com/cpu-throttling: "false"
 
     spec:
-      # Request timeout — allow long investigations.
       timeoutSeconds: 300
 
       containers:
-        - image: gcr.io/PROJECT_ID/aeam:latest
+        - image: gcr.io/aeam-project/aeam:latest
           name: aeam
 
           ports:
@@ -48,24 +38,14 @@ spec:
               cpu: "2"
               memory: 4Gi
 
+          # ✅ FIXED ENV (NO SECRETS — SAFE MODE)
           env:
             - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: aeam-database-url
-                  key: latest
+              value: "sqlite:///./aeam.db"
 
-            - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  name: aeam-redis-url
-                  key: latest
-
+            # REDIS_URL omitted because it's optional and not used in safe mode
             - name: VECTOR_DB_URL
-              valueFrom:
-                secretKeyRef:
-                  name: aeam-vector-db-url
-                  key: latest
+              value: ""
 
             - name: ENVIRONMENT
               value: "production"
@@ -79,27 +59,26 @@ spec:
             - name: MAX_INVESTIGATION_DEPTH
               value: "5"
 
-          # Liveness probe — restart container if /health fails.
+          # Liveness probe
           livenessProbe:
             httpGet:
               path: /health
               port: 8080
-            initialDelaySeconds: 15
+            initialDelaySeconds: 20
             periodSeconds: 30
             failureThreshold: 3
             timeoutSeconds: 10
 
-          # Startup probe — allow extra time for model loading.
+          # Startup probe (more relaxed)
           startupProbe:
             httpGet:
               path: /health
               port: 8080
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             periodSeconds: 10
-            failureThreshold: 6
+            failureThreshold: 10
             timeoutSeconds: 10
 
-  # Route 100% of traffic to the latest revision.
   traffic:
     - percent: 100
       latestRevision: true

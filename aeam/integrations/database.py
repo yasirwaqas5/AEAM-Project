@@ -564,3 +564,4 @@ class DatabaseClient:
             f"checked_out={pool.checkedout()}, "
             f"overflow={pool.overflow()})"
         )
+    
